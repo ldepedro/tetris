@@ -1,15 +1,15 @@
 import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
+  config: {
+    initialColorMode: "dark",
+    useSystemColorMode: false
+  },
   styles: {
     global: {
-      body: {
-        margin: 0,
-        padding: 0,
-        fontFamily: "Arial, sans-serif",
-      },
-    },
-  },
+      "html, body, #root": { height: "100%" }
+    }
+  }
 });
 
 export default theme;

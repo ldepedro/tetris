@@ -1,43 +1,64 @@
-import React, { useState, useEffect } from "react";
-import { VStack, Text, Button, HStack } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import {
+  Box, VStack, HStack, Text, Button, useColorModeValue, Badge
+} from "@chakra-ui/react";
+import TetrisBoard from "./TetrisBoard.jsx";
+import useTetrisLogic from "../hooks/useTetrisLogic.js";
 
-export default function Tetris({ player }) {
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [level, setLevel] = useState(1);
-  const [speed, setSpeed] = useState(1000);
+export default function Tetris({ player, accent = "cyan", onQuit }) {
+  const panelBg = useColorModeValue("white", "whiteAlpha.200");
 
-  // Fake Tetris loop (replace with actual grid logic later)
+  const {
+    board, next, score, level, lines, lives,
+    running, gameOver,
+    start, togglePause,
+    moveLeft, moveRight, rotate, softDrop, hardDrop
+  } = useTetrisLogic({ accent });
+
+  // keyboard controls
   useEffect(() => {
-    const interval = setInterval(() => {
-      setScore((s) => s + 10);
-    }, speed);
+    const onKey = (e) => {
+      if (!running || gameOver) return;
+      if (e.key === "ArrowLeft") moveLeft();
+      else if (e.key === "ArrowRight") moveRight();
+      else if (e.key === "ArrowDown") softDrop();
+      else if (e.key === "ArrowUp") rotate();
+      else if (e.code === "Space") { e.preventDefault(); hardDrop(); }
+      else if (e.key.toLowerCase() === "p") togglePause();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [running, gameOver, moveLeft, moveRight, rotate, softDrop, hardDrop, togglePause]);
 
-    return () => clearInterval(interval);
-  }, [speed]);
-
-  useEffect(() => {
-    if (score > 0 && score % 100 === 0) {
-      setLevel((l) => l + 1);
-      setSpeed((s) => Math.max(200, s - 100)); // faster blocks
-    }
-  }, [score]);
-
-  const loseLife = () => {
-    setLives((l) => l - 1);
-    if (lives <= 1) alert("Game Over!");
-  };
+  useEffect(() => { start(); }, [start]);
 
   return (
-    <VStack spacing={4}>
-      <Text fontSize="2xl">👤 Player: {player}</Text>
-      <Text>⭐ Score: {score}</Text>
-      <Text>⬆️ Level: {level}</Text>
-      <Text>❤️ Lives: {lives}</Text>
+    <VStack w="full" spacing={4} align="stretch">
+      <HStack justify="space-between">
+        <Text fontWeight="bold">Player: {player}</Text>
+        <HStack>
+          <Badge colorScheme={accent}>{running && !gameOver ? "RUNNING" : gameOver ? "GAME OVER" : "PAUSED"}</Badge>
+          <Button size="sm" onClick={togglePause}>{running ? "Pause" : "Resume"}</Button>
+          <Button size="sm" colorScheme="red" onClick={onQuit}>Quit</Button>
+          <Button size="sm" onClick={start}>Restart</Button>
+        </HStack>
+      </HStack>
 
-      <HStack>
-        <Button onClick={() => setScore((s) => s + 10)}>+10 Score</Button>
-        <Button onClick={loseLife}>Lose Life</Button>
+      <HStack align="start" spacing={6}>
+        <TetrisBoard board={board} activeAccent={accent} next={next} />
+
+        <Box p={4} rounded="md" bg={panelBg} minW="180px">
+          <VStack align="stretch" spacing={2}>
+            <Text>⭐ Score: {score}</Text>
+            <Text>⬆️ Level: {level}</Text>
+            <Text>📏 Lines: {lines}</Text>
+            <Text>❤️ Lives: {lives}</Text>
+            <Box mt={3}>
+              <Text fontSize="sm" opacity={0.7}>Controls</Text>
+              <Text className="small">← → move • ↑ rotate • ↓ soft drop • Space hard drop • P pause</Text>
+            </Box>
+          </VStack>
+        </Box>
       </HStack>
     </VStack>
   );
