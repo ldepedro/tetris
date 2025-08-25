@@ -60,7 +60,7 @@ function clearLines(board) {
   return { board: kept, lines: cleared };
 }
 
-export default function useTetrisLogic({ accent = "cyan" } = {}) {
+export default function useTetrisLogic() {
   const [board, setBoard] = useState(newBoard);
   const [active, setActive] = useState(() => ({ ...randomPiece(), x: 3, y: -1 }));
   const [next, setNext] = useState(randomPiece());
@@ -130,7 +130,7 @@ export default function useTetrisLogic({ accent = "cyan" } = {}) {
 
       // move back up one, then lock
       const lockedY = active.y - 1;
-      const merged = merge(board, active, active.x, lockedY, active.color || accent);
+      const merged = merge(board, active, active.x, lockedY, active.color);
       const { board: cleared, lines: got } = clearLines(merged);
 
       if (got > 0) {
@@ -194,11 +194,11 @@ export default function useTetrisLogic({ accent = "cyan" } = {}) {
       const x = active.x + c;
       const y = active.y + r;
       if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-        b[y][x] = { color: active.color || accent };
+        b[y][x] = { color: active.color };
       }
     }
     return b;
-  }, [board, active, accent]);
+  }, [board, active]);
 
   return {
     board: renderedBoard,

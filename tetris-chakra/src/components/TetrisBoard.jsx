@@ -3,7 +3,7 @@ import { Box, Grid, GridItem, VStack, Text, useColorModeValue } from "@chakra-ui
 
 const CELL = 26; // px
 
-export default function TetrisBoard({ board, activeAccent = "cyan", next }) {
+export default function TetrisBoard({ board, next }) {
   const border = useColorModeValue("gray.300", "whiteAlpha.400");
   const emptyBg = useColorModeValue("gray.200", "gray.700");
 
@@ -12,11 +12,12 @@ export default function TetrisBoard({ board, activeAccent = "cyan", next }) {
     pink: "pink.400",
     orange: "orange.400",
     green: "green.400",
-    purple: "purple.400"
+    purple: "purple.400",
   };
 
   return (
     <VStack align="center" spacing={3}>
+      {/* Main board */}
       <Grid
         templateColumns={`repeat(${board[0].length}, ${CELL}px)`}
         templateRows={`repeat(${board.length}, ${CELL}px)`}
@@ -55,15 +56,14 @@ export default function TetrisBoard({ board, activeAccent = "cyan", next }) {
           {Array.from({ length: 4 }).map((_, r) =>
             Array.from({ length: 4 }).map((_, c) => {
               const filled = next?.shape?.[r]?.[c] === 1;
-              const color = next?.color || activeAccent;
-              const map = { cyan: "cyan.400", pink: "pink.400", orange: "orange.400", green: "green.400", purple: "purple.400" };
+              const color = next?.color;
               return (
                 <Box
                   key={`${r}-${c}`}
                   w="18px"
                   h="18px"
                   rounded="2px"
-                  bg={filled ? map[color] || "teal.400" : useColorModeValue("gray.200","gray.700")}
+                  bg={filled ? accentMap[color] || "teal.400" : useColorModeValue("gray.200","gray.700")}
                 />
               );
             })

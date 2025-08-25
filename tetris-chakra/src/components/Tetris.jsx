@@ -5,7 +5,7 @@ import {
 import TetrisBoard from "./TetrisBoard.jsx";
 import useTetrisLogic from "../hooks/useTetrisLogic.js";
 
-export default function Tetris({ player, accent = "cyan", onQuit }) {
+export default function Tetris({ player, onQuit }) {
   const panelBg = useColorModeValue("white", "whiteAlpha.200");
 
   const {
@@ -13,7 +13,7 @@ export default function Tetris({ player, accent = "cyan", onQuit }) {
     running, gameOver,
     start, togglePause,
     moveLeft, moveRight, rotate, softDrop, hardDrop
-  } = useTetrisLogic({ accent });
+  } = useTetrisLogic();
 
   // keyboard controls
   useEffect(() => {
@@ -37,7 +37,9 @@ export default function Tetris({ player, accent = "cyan", onQuit }) {
       <HStack justify="space-between">
         <Text fontWeight="bold">Player: {player}</Text>
         <HStack>
-          <Badge colorScheme={accent}>{running && !gameOver ? "RUNNING" : gameOver ? "GAME OVER" : "PAUSED"}</Badge>
+          <Badge colorScheme="purple">
+            {running && !gameOver ? "RUNNING" : gameOver ? "GAME OVER" : "PAUSED"}
+          </Badge>
           <Button size="sm" onClick={togglePause}>{running ? "Pause" : "Resume"}</Button>
           <Button size="sm" colorScheme="red" onClick={onQuit}>Quit</Button>
           <Button size="sm" onClick={start}>Restart</Button>
@@ -45,7 +47,7 @@ export default function Tetris({ player, accent = "cyan", onQuit }) {
       </HStack>
 
       <HStack align="start" spacing={6}>
-        <TetrisBoard board={board} activeAccent={accent} next={next} />
+        <TetrisBoard board={board} next={next} />
 
         <Box p={4} rounded="md" bg={panelBg} minW="180px">
           <VStack align="stretch" spacing={2}>
